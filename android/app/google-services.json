@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "686819576656",
+    "firebase_url": "https://eashion-default-rtdb.asia-southeast1.firebasedatabase.app",
+    "project_id": "eashion",
+    "storage_bucket": "eashion.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686819576656:android:e9cd761ae1126f4876ba55",
+        "android_client_info": {
+          "package_name": "com.example.eashion2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA2rL2oaYi3tDkOg8P69Q05YK1X-gFXVMM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
