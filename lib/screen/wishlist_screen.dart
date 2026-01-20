@@ -3,8 +3,23 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/product_model.dart';
 
-class WishlistScreen extends StatelessWidget {
+class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
+
+  @override
+  State<WishlistScreen> createState() => _WishlistScreenState();
+}
+
+class _WishlistScreenState extends State<WishlistScreen> {
+  @override
+  void initState() {
+    super.initState();
+
+    // 🔥 Load wishlist from SQLite into Provider
+    Future.microtask(() {
+      Provider.of<WishlistProvider>(context, listen: false).loadWishlist();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -23,9 +38,7 @@ class WishlistScreen extends StatelessWidget {
         actions: [
           Consumer<WishlistProvider>(
             builder: (context, wishlist, _) => TextButton(
-              onPressed: () {
-                wishlist.toggleSelectMode();
-              },
+              onPressed: wishlist.toggleSelectMode,
               child: Text(
                 wishlist.isSelectMode ? 'Cancel' : 'Select',
                 style: const TextStyle(color: Colors.black),
@@ -67,9 +80,7 @@ class WishlistScreen extends StatelessWidget {
               children: [
                 Expanded(
                   child: TextButton(
-                    onPressed: () {
-                      wishlist.deleteSelected();
-                    },
+                    onPressed: wishlist.deleteSelected,
                     child: const Text(
                       'Delete',
                       style: TextStyle(
@@ -83,7 +94,7 @@ class WishlistScreen extends StatelessWidget {
                 Expanded(
                   child: TextButton(
                     onPressed: () {
-                      // Later: move to cart logic
+                      // TODO: Move to cart
                     },
                     child: const Text(
                       'Move to Bag',
@@ -103,6 +114,8 @@ class WishlistScreen extends StatelessWidget {
     );
   }
 
+  // -------------------- ITEM CARD --------------------
+
   Widget _wishlistItem(BuildContext context, Product product) {
     final wishlist = context.watch<WishlistProvider>();
 
@@ -120,9 +133,7 @@ class WishlistScreen extends StatelessWidget {
         children: [
           if (wishlist.isSelectMode)
             GestureDetector(
-              onTap: () {
-                wishlist.toggleSelection(product.id);
-              },
+              onTap: () => wishlist.toggleSelection(product.id),
               child: Padding(
                 padding: const EdgeInsets.only(left: 2, right: 4),
                 child: Container(
@@ -136,7 +147,8 @@ class WishlistScreen extends StatelessWidget {
                         : Colors.white,
                   ),
                   child: wishlist.isSelected(product.id)
-                      ? const Icon(Icons.check, size: 14, color: Colors.white)
+                      ? const Icon(Icons.check,
+                          size: 14, color: Colors.white)
                       : null,
                 ),
               ),
@@ -174,7 +186,7 @@ class WishlistScreen extends StatelessWidget {
                       "Rs. ${(product.price - (product.price * product.discount / 100)).toStringAsFixed(2)}",
                       style: const TextStyle(fontWeight: FontWeight.w600),
                     ),
-                    SizedBox(width: 10),
+                    const SizedBox(width: 10),
                     Text(
                       "Rs. ${product.price.toStringAsFixed(2)}",
                       style: const TextStyle(
@@ -188,7 +200,8 @@ class WishlistScreen extends StatelessWidget {
                 if (product.discount > 0)
                   Text(
                     "-${product.discount}% OFF",
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
+                    style:
+                        const TextStyle(color: Colors.red, fontSize: 12),
                   ),
               ],
             ),
@@ -198,7 +211,7 @@ class WishlistScreen extends StatelessWidget {
     );
   }
 
-  // ===================== EMPTY UI =====================
+  // -------------------- EMPTY VIEW --------------------
 
   Widget _emptyWishlist() {
     return Center(

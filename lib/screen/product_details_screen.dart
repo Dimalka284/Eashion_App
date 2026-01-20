@@ -1,7 +1,10 @@
 import 'package:eashion2/model/product_model.dart';
 import 'package:eashion2/provider/product_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
+import 'package:eashion2/screen/auth_screen.dart';
+import 'package:eashion2/services/cart_service.dart';
 import 'package:eashion2/services/product_service.dart';
+import 'package:eashion2/services/user_session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -190,13 +193,38 @@ class ProductDetailsScreen extends StatelessWidget {
                             return;
                           }
                         },
-                        child: const Text(
-                          'ADD TO SHOPPING BAG',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                            letterSpacing: 1,
-                            color: Colors.white,
+                        child: GestureDetector(
+                          onTap: () async {
+                            final token = await UserSessionService().getToken();
+                            if (token == null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => AuthScreen(),
+                                ),
+                              );
+                            }
+
+                            final success = await CartService().addtoCart(
+                              token: token,
+                              productId: product.id,
+                            );
+                            if (success) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text('Added to shopping bag'),
+                                ),
+                              );
+                            }
+                          },
+                          child: const Text(
+                            'ADD TO SHOPPING BAG',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                              letterSpacing: 1,
+                              color: Colors.white,
+                            ),
                           ),
                         ),
                       ),

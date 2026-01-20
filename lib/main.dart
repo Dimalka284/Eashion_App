@@ -1,4 +1,5 @@
 import 'package:eashion2/provider/auth_provider.dart';
+import 'package:eashion2/provider/cart_provider.dart';
 import 'package:eashion2/provider/navigation_provider.dart';
 import 'package:eashion2/provider/product_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
@@ -17,6 +18,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => AuthProvider()),
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
+        ChangeNotifierProvider(create: (_) => CartProvider()),
       ],
       child: const MyApp(),
     ),
