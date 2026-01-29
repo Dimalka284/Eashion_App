@@ -1,3 +1,4 @@
+import 'package:eashion2/screen/auth_screen.dart';
 import 'package:flutter/material.dart';
 
 class GuestView extends StatelessWidget {
@@ -7,68 +8,99 @@ class GuestView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Access the current theme (which changes via your sensors)
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Center(
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 40,
+        ), // Slightly wider padding for luxury feel
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.tag_faces_sharp, color: Colors.amber, size: 250),
-            const SizedBox(height: 24),
+            // Using a more minimalist icon or your logo would go here
+            Icon(
+              Icons.shopping_bag_outlined,
+              color: colorScheme.primary,
+              size: 180,
+            ),
+            const SizedBox(height: 40),
             Text(
-              title,
+              title.toUpperCase(), // Uppercase for fashion branding
               style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-                letterSpacing: 1,
+                fontSize: 20,
+                fontWeight: FontWeight.w900, // Thick bold
+                letterSpacing: 4, // Spaced out for high-end look
+                color: colorScheme.onSurface,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: 16),
             Text(
               description,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
+              style: TextStyle(
+                fontSize: 14,
+                height: 1.5, // Better line spacing for readability
+                color: colorScheme.onSurface.withOpacity(0.6),
+              ),
             ),
-            const SizedBox(height: 32),
+            const SizedBox(height: 48),
+
+            // SIGN IN BUTTON (Primary)
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                  backgroundColor:
+                      colorScheme.primary, // Black in Light, White in Dark
+                  foregroundColor:
+                      colorScheme.onPrimary, // White in Light, Black in Dark
+                  elevation: 0,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero, // Minimalist sharp corners
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/login');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AuthScreen()),
+                  );
                 },
                 child: const Text(
                   'SIGN IN',
-                  style: TextStyle(letterSpacing: 1, color: Colors.white,fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),
-
             const SizedBox(height: 16),
-
-            // JOIN BUTTON
             SizedBox(
               width: double.infinity,
-              height: 48,
+              height: 55,
               child: OutlinedButton(
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Colors.black),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(4),
+                  side: BorderSide(color: colorScheme.primary, width: 1.5),
+                  foregroundColor: colorScheme.primary,
+                  shape: const RoundedRectangleBorder(
+                    borderRadius: BorderRadius.zero, // Sharp corners
                   ),
                 ),
                 onPressed: () {
-                  Navigator.pushNamed(context, '/register');
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => AuthScreen()),
+                  );
                 },
                 child: const Text(
                   'JOIN',
-                  style: TextStyle(letterSpacing: 1, color: Colors.black,fontWeight: FontWeight.bold),
+                  style: TextStyle(
+                    letterSpacing: 2,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ),

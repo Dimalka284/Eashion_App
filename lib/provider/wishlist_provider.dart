@@ -1,3 +1,4 @@
+import 'package:eashion2/services/cart_service.dart';
 import 'package:flutter/material.dart';
 import '../model/product_model.dart';
 import '../services/wishlist_service.dart';
@@ -98,4 +99,28 @@ class WishlistProvider extends ChangeNotifier {
     _selectedIds.clear();
     notifyListeners();
   }
+
+  Future<void> moveSelectedToCart(String token) async {
+    final cartService = CartService();
+
+    final selectedProducts =
+        _wishlistProducts.where((p) => _selectedIds.contains(p.id)).toList();
+
+    for (final product in selectedProducts) {
+      await cartService.addtoCart(
+        token: token,
+        productId: product.id,
+        quantity: 1,
+      );
+
+      await WishlistService().removeFromWishlist(product.id);
+    }
+    
+    _wishlistProducts.removeWhere((p) => _selectedIds.contains(p.id));
+    _selectedIds.clear();
+    _isSelectMode = false;
+
+    notifyListeners();
+  }
+
 }

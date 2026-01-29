@@ -7,17 +7,26 @@ class ProductCard extends StatelessWidget {
   const ProductCard({super.key, required this.product});
 
   final Product product;
+
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+
     double finalPrice =
         product.price - (product.price * product.discount / 100);
+
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: isDark
+            ? colorScheme.surface
+            : colorScheme.onPrimary,
         borderRadius: BorderRadius.circular(20),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: isDark
+                ? Colors.black.withOpacity(0.4)
+                : Colors.black.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 5),
           ),
@@ -42,41 +51,53 @@ class ProductCard extends StatelessWidget {
                       height: double.infinity,
                       fit: BoxFit.cover,
                       errorBuilder: (context, error, stackTrace) => Container(
-                        color: Colors.grey[200],
-                        child: const Icon(
+                        color: isDark
+                            ? Colors.grey.shade900
+                            : Colors.grey.shade200,
+                        child: Icon(
                           Icons.image_not_supported,
-                          color: Colors.grey,
+                          color: Colors.grey.shade500,
                         ),
                       ),
                     ),
                   ),
                 ),
+
+                /// WISHLIST BUTTON
                 Positioned(
                   top: 10,
                   right: 10,
                   child: Container(
-                    width: 35,
-                    height: 35,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.9),
+                      color: isDark
+                          ? Colors.black.withOpacity(0.6)
+                          : Colors.white.withOpacity(0.9),
                       shape: BoxShape.circle,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
+                          color: Colors.black.withOpacity(0.15),
                           blurRadius: 4,
                         ),
                       ],
                     ),
                     child: Consumer<WishlistProvider>(
                       builder: (context, wishlist, _) {
-                        final isWishlisted = wishlist.isWishlisted(product.id);
+                        final isWishlisted =
+                            wishlist.isWishlisted(product.id);
 
                         return IconButton(
+                          padding: EdgeInsets.zero,
                           icon: Icon(
                             isWishlisted
                                 ? Icons.favorite
                                 : Icons.favorite_border,
-                            color: isWishlisted ? Colors.red : Colors.black87,
+                            color: isWishlisted
+                                ? Colors.redAccent
+                                : (isDark
+                                    ? Colors.white
+                                    : Colors.black87),
                             size: 20,
                           ),
                           onPressed: () async {
@@ -84,6 +105,7 @@ class ProductCard extends StatelessWidget {
 
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
+                                backgroundColor: colorScheme.primary,
                                 content: Text(
                                   isWishlisted
                                       ? 'Removed from wishlist'
@@ -101,7 +123,8 @@ class ProductCard extends StatelessWidget {
               ],
             ),
           ),
-          // Product Details
+
+          /// PRODUCT DETAILS
           Expanded(
             flex: 1,
             child: Padding(
@@ -114,19 +137,21 @@ class ProductCard extends StatelessWidget {
                     product.name,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
+                    style: TextStyle(
                       fontWeight: FontWeight.bold,
                       fontSize: 14,
-                      fontFamily: 'Roboto',
+                      color: colorScheme.primary,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    "Rs.${finalPrice.toStringAsFixed(2)}",
+                    "Rs. ${finalPrice.toStringAsFixed(2)}",
                     style: TextStyle(
                       fontWeight: FontWeight.w900,
                       fontSize: 16,
-                      color: Colors.blueGrey[900],
+                      color: isDark
+                          ? Colors.white
+                          : Colors.blueGrey.shade900,
                     ),
                   ),
                 ],

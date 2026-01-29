@@ -3,6 +3,7 @@ import 'package:eashion2/provider/cart_provider.dart';
 import 'package:eashion2/provider/navigation_provider.dart';
 import 'package:eashion2/provider/product_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
+import 'package:eashion2/screen/checkout_screen.dart';
 import 'package:eashion2/widgets/Wrapper.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -31,10 +32,39 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        useMaterial3: true,
+        brightness: Brightness.light,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.black,
+          brightness: Brightness.light,
+          primary: Colors.black,
+          onPrimary: Colors.white,
+          secondary: const Color(
+            0xFFF1F5F9,
+          ),
+
+        ),
       ),
+
+      // Dark Theme Configuration
+      darkTheme: ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.black,
+          brightness: Brightness.dark,
+          primary: Colors.white,
+          onPrimary: Colors.black,
+          secondary: const Color(0xFF1E2632),
+        ),
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Color(0xFF121212),
+          foregroundColor: Colors.white,
+          elevation: 0,
+        ),
+      ),
+      themeMode: ThemeMode.system,
       home: Wrapper(),
     );
   }

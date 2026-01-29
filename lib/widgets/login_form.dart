@@ -2,6 +2,7 @@ import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/widgets/app_text_field.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 
 class LoginForm extends StatelessWidget {
   LoginForm({super.key});
@@ -50,6 +51,7 @@ class LoginForm extends StatelessWidget {
                     color: Colors.white70,
                     fontSize: 10,
                     letterSpacing: 1,
+                    fontFamily: 'RobotoR'
                   ),
                 ),
               ),
@@ -75,12 +77,18 @@ class LoginForm extends StatelessWidget {
                               .read<AuthProvider>()
                               .login(_emailtxt.text, _passwordtext.text);
                           if (success && context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('LOGIN SUCCESSFUL')),
+                            QuickAlert.show(
+                              context: context,
+                              text: "Login Successful",
+                              type: QuickAlertType.success,
+                              autoCloseDuration: Duration(seconds: 2),
                             );
-                          }else{
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(content: Text('Login Failed')),
+                          } else {
+                            QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              text: "Login failed",
+                              autoCloseDuration: Duration(seconds: 2),
                             );
                           }
                         }

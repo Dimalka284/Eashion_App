@@ -12,6 +12,7 @@ class SectionHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -21,6 +22,7 @@ class SectionHeader extends StatelessWidget {
             fontFamily: "PlayfairDisplay",
             fontSize: 22,
             fontWeight: FontWeight.bold,
+            color: colorScheme.primary
           ),
         ),
         isSeeAll ? Text("SEE ALL", style: TextStyle(color: Colors.blue)) : SizedBox(),

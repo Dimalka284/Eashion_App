@@ -71,4 +71,32 @@ class CartService {
     }
   }  
 
+  //Update qty
+  // Update quantity of a cart item
+Future<bool> updateCartQuantity({
+  required String token,
+  required int cartItemId,
+  required int quantity,
+}) async {
+  final response = await http.put(
+    ApiService.getUri('cart/$cartItemId'), 
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'Authorization': 'Bearer $token',
+    },
+    body: jsonEncode({
+      'quantity': quantity,
+    }),
+  );
+
+  if (response.statusCode == 200) {
+    return true;
+  } else {
+    print('Update cart quantity failed: ${response.body}');
+    return false;
+  }
+}
+
+
 }

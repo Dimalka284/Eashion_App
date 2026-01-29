@@ -11,7 +11,7 @@ class CategoryScreen extends StatelessWidget {
     final colorScheme = Theme.of(context).colorScheme;
     return SafeArea(
       child: Scaffold(
-        backgroundColor: colorScheme.secondary,
+        backgroundColor: colorScheme.onPrimary,
         body: SingleChildScrollView(
           child: Column(
             children: [

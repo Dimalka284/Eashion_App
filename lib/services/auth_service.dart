@@ -56,4 +56,27 @@ class AuthService {
 
     return data;
   }
+
+  //Logout
+  Future<bool> logout(String token) async {
+    final _session = UserSessionService();
+    final response = await http.post(
+      ApiService.getUri('logout'),
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer $token',
+      },
+    );
+    final data = jsonDecode(response.body);
+    if (response.statusCode == 200 && data['status'] == true) {
+      // Remove token and user id
+      await _session.clearAuth();
+      return true;
+    }else{
+      print('Logout failed: ${response.body}');
+      return false;
+    }
+    
+  }
 }

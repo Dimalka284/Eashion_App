@@ -1,4 +1,6 @@
+import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
+import 'package:eashion2/services/user_session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../model/product_model.dart';
@@ -14,16 +16,15 @@ class _WishlistScreenState extends State<WishlistScreen> {
   @override
   void initState() {
     super.initState();
-
-    // 🔥 Load wishlist from SQLite into Provider
     Future.microtask(() {
       Provider.of<WishlistProvider>(context, listen: false).loadWishlist();
     });
   }
-
   @override
   Widget build(BuildContext context) {
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: colorScheme.onPrimary,
       appBar: AppBar(
         elevation: 0,
         centerTitle: true,
@@ -41,19 +42,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
               onPressed: wishlist.toggleSelectMode,
               child: Text(
                 wishlist.isSelectMode ? 'Cancel' : 'Select',
-                style: const TextStyle(color: Colors.black),
+                style: const TextStyle(color:Colors.grey),
               ),
             ),
           ),
         ],
       ),
-
       body: Consumer<WishlistProvider>(
         builder: (context, wishlist, _) {
           if (wishlist.wishlistProducts.isEmpty) {
             return _emptyWishlist();
           }
-
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: wishlist.wishlistProducts.length,
@@ -64,13 +63,11 @@ class _WishlistScreenState extends State<WishlistScreen> {
           );
         },
       ),
-
       bottomNavigationBar: Consumer<WishlistProvider>(
         builder: (context, wishlist, _) {
           if (!wishlist.isSelectMode || wishlist.selectedIds.isEmpty) {
             return const SizedBox.shrink();
           }
-
           return Container(
             height: 60,
             decoration: const BoxDecoration(
@@ -86,22 +83,30 @@ class _WishlistScreenState extends State<WishlistScreen> {
                       style: TextStyle(
                         color: Colors.red,
                         fontSize: 16,
-                        fontFamily: 'RExtraBoldItalic',
+                        fontFamily: 'PlayfairDisplay',
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
                 ),
                 Expanded(
                   child: TextButton(
-                    onPressed: () {
-                      // TODO: Move to cart
+                    onPressed: () async {
+                      final wishlist = context.read<WishlistProvider>();
+                      final token = await UserSessionService().getToken();
+                      await wishlist.moveSelectedToCart(token!);
+                      if (!mounted) return;
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Moved to shopping bag')),
+                      );
                     },
                     child: const Text(
                       'Move to Bag',
                       style: TextStyle(
                         color: Colors.blue,
                         fontSize: 16,
-                        fontFamily: 'RExtraBoldItalic',
+                        fontFamily: 'PlayfairDisplay',
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
                   ),
@@ -114,16 +119,17 @@ class _WishlistScreenState extends State<WishlistScreen> {
     );
   }
 
-  // -------------------- ITEM CARD --------------------
 
   Widget _wishlistItem(BuildContext context, Product product) {
     final wishlist = context.watch<WishlistProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
+
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color:colorScheme.secondary ,
         borderRadius: BorderRadius.circular(12),
         boxShadow: [
           BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
@@ -147,8 +153,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                         : Colors.white,
                   ),
                   child: wishlist.isSelected(product.id)
-                      ? const Icon(Icons.check,
-                          size: 14, color: Colors.white)
+                      ? const Icon(Icons.check, size: 14, color: Colors.white)
                       : null,
                 ),
               ),
@@ -200,8 +205,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
                 if (product.discount > 0)
                   Text(
                     "-${product.discount}% OFF",
-                    style:
-                        const TextStyle(color: Colors.red, fontSize: 12),
+                    style: const TextStyle(color: Colors.red, fontSize: 12),
                   ),
               ],
             ),
@@ -211,7 +215,6 @@ class _WishlistScreenState extends State<WishlistScreen> {
     );
   }
 
-  // -------------------- EMPTY VIEW --------------------
 
   Widget _emptyWishlist() {
     return Center(

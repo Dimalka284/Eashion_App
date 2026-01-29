@@ -20,6 +20,7 @@ class Wrapper extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final navProvider = context.watch<NavigationProvider>();
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
       body: _screens[navProvider.currentIndex],
       bottomNavigationBar: NavigationBar(
@@ -28,13 +29,13 @@ class Wrapper extends StatelessWidget {
         onDestinationSelected: (index) {
           context.read<NavigationProvider>().setIndex(index);
         },
-        backgroundColor: Colors.grey[200],
+        backgroundColor: colorScheme.onPrimary,
         indicatorColor: Colors.black.withOpacity(0.1),
         labelBehavior: NavigationDestinationLabelBehavior.alwaysHide,
-        destinations: const [
+        destinations:[
           NavigationDestination(
             icon: Icon(Icons.home_outlined),
-            selectedIcon: Icon(Icons.home),
+            selectedIcon: Icon(Icons.home,color:colorScheme.primary,),
             label: 'Home',
           ),
           NavigationDestination(
@@ -49,7 +50,7 @@ class Wrapper extends StatelessWidget {
           ),
           NavigationDestination(
             icon: Icon(Icons.shopping_bag_outlined),
-            selectedIcon: Icon(Icons.shopping_bag),
+            selectedIcon: Icon(Icons.shopping_bag,color:colorScheme.primary),
             label: 'Cart',
           ),
           NavigationDestination(

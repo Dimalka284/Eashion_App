@@ -2,7 +2,7 @@ import 'package:eashion2/model/product_model.dart';
 
 class CartItem {
   final int id;
-  final int quantity;
+  int quantity;
   final Product product;
 
   CartItem({

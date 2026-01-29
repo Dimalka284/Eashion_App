@@ -65,4 +65,5 @@ class AuthProvider with ChangeNotifier {
       return false;
     }
   }
+
 }

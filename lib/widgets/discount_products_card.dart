@@ -18,6 +18,7 @@ class DiscountProducts extends StatelessWidget {
       viewportFraction: 0.89,
       initialPage: 0,
     );
+    final colorScheme = Theme.of(context).colorScheme;
 
     return FutureBuilder<List<Product>>(
       future: _discountproducts,
@@ -248,17 +249,19 @@ class DiscountProducts extends StatelessWidget {
                                                 color: Colors.white,
                                                 fontSize: 24,
                                                 fontWeight: FontWeight.bold,
-                                                letterSpacing: 0.5,
+                                                letterSpacing: 0.3,
+                                                fontFamily: 'Roboto'
                                               ),
                                             ),
                                             SizedBox(width: 12),
                                             Text(
-                                              'Rs.${product.price.toStringAsFixed(2)}',
+                                              'Rs.${product.price.toString()}',
                                               style: TextStyle(
                                                 color: Colors.white.withOpacity(
                                                   0.5,
                                                 ),
                                                 fontSize: 14,
+                                                fontFamily: 'RobotoR',
                                                 decoration:
                                                     TextDecoration.lineThrough,
                                                 decorationColor: Colors.white
@@ -307,6 +310,7 @@ class DiscountProducts extends StatelessWidget {
                                                         context,
                                                       ).showSnackBar(
                                                         SnackBar(
+                                                          backgroundColor:colorScheme.primary ,
                                                           content: Text(
                                                             isWishlisted
                                                                 ? 'Removed from wishlist'

@@ -16,14 +16,17 @@ class HomeScreen extends StatelessWidget {
     late Future<List<Product>> _discountproducts;
     _productsFuture = ProductService().fetchProducts();
     _discountproducts = ProductService().fetchDiscount();
+    final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
+      backgroundColor: colorScheme.onPrimary,
       appBar: AppBar(
+        backgroundColor: Theme.of(context).colorScheme.onPrimary,
         leading: const Icon(Icons.menu, size: 35),
-        title: const Center(
+        title: Center(
           child: Text(
             "EASHION",
             style: TextStyle(
-              color: Colors.black,
+              color: colorScheme.primary,
               fontSize: 25,
               fontWeight: FontWeight.bold,
               fontFamily: 'PlayfairDisplay',

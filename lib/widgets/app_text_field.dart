@@ -19,9 +19,15 @@ class AppTextField extends StatelessWidget {
       controller: controller,
       obscureText: isPassword,
       validator: validator,
+      style:TextStyle(
+        fontFamily: 'RobotoR'
+      ),
       decoration: InputDecoration(
         labelText: lable,
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(10),),
+        labelStyle: TextStyle(
+          fontFamily: 'RobotoR'
+        )
       ),
     );
   }

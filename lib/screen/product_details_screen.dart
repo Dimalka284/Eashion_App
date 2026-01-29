@@ -2,9 +2,11 @@ import 'package:eashion2/model/product_model.dart';
 import 'package:eashion2/provider/product_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
 import 'package:eashion2/screen/auth_screen.dart';
+import 'package:eashion2/screen/cart_screen.dart';
 import 'package:eashion2/services/cart_service.dart';
 import 'package:eashion2/services/product_service.dart';
 import 'package:eashion2/services/user_session_service.dart';
+import 'package:eashion2/widgets/product_tag.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -17,18 +19,19 @@ class ProductDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final productProvider = context.watch<ProductProvider>();
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final colorScheme = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: isDark ? colorScheme.surface : colorScheme.onPrimary,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: isDark ? colorScheme.surface : colorScheme.onPrimary,
         elevation: 0,
         centerTitle: true,
-
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new, color: Colors.black),
+          icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.onSurface),
           onPressed: () => Navigator.pop(context),
         ),
-
         title: FutureBuilder<Product>(
           future: ProductService().fetchProductDetails(productId),
           builder: (context, snapshot) {
@@ -44,15 +47,14 @@ class ProductDetailsScreen extends StatelessWidget {
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
               textAlign: TextAlign.center,
-              style: const TextStyle(
+              style: TextStyle(
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
-                color: Colors.black,
+                color: colorScheme.onSurface,
               ),
             );
           },
         ),
-
         actions: [
           Consumer<WishlistProvider>(
             builder: (context, wishlist, _) {
@@ -60,12 +62,10 @@ class ProductDetailsScreen extends StatelessWidget {
               return IconButton(
                 icon: Icon(
                   isWishlisted ? Icons.favorite : Icons.favorite_border,
-                  color: isWishlisted ? Colors.red : Colors.black,
+                  color: isWishlisted ? Colors.redAccent : colorScheme.onSurface,
                 ),
                 onPressed: () async {
-                  final product = await ProductService().fetchProductDetails(
-                    productId,
-                  );
+                  final product = await ProductService().fetchProductDetails(productId);
                   wishlist.toggleWishlist(product);
                   ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(
@@ -90,35 +90,42 @@ class ProductDetailsScreen extends StatelessWidget {
             return const Center(child: CircularProgressIndicator());
           }
           if (snapshot.hasError) {
-            return Center(child: Text('ERROR ${snapshot.error}'));
+            return Center(child: Text('ERROR: ${snapshot.error}'));
           }
 
           final product = snapshot.data!;
 
-          return Stack(
-            children: [
-              SingleChildScrollView(
-                padding: const EdgeInsets.only(
-                  left: 16,
-                  right: 16,
-                  bottom: 100,
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(20),
-                      child: Image.network(
-                        product.imageUrl,
-                        width: double.infinity,
-                        height: 420,
-                        fit: BoxFit.cover,
+          return SingleChildScrollView(
+            padding: const EdgeInsets.only(left: 16, right: 16, bottom: 100),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// PRODUCT IMAGE
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(20),
+                  child: Image.network(
+                    product.imageUrl,
+                    width: double.infinity,
+                    height: 420,
+                    fit: BoxFit.cover,
+                    errorBuilder: (context, error, stackTrace) => Container(
+                      color: isDark ? Colors.grey.shade900 : Colors.grey.shade200,
+                      child: Icon(
+                        Icons.image_not_supported,
+                        color: Colors.grey.shade500,
+                        size: 50,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                  ),
+                ),
+                const SizedBox(height: 16),
+
+                /// PRICE ROW
+                Row(
+                  children: [
                     Text(
-                      'Rs.${product.price.toStringAsFixed(2)}',
-                      style: const TextStyle(
+                      'Rs.${(product.price - (product.price * product.discount / 100)).toStringAsFixed(2)}',
+                      style: TextStyle(
                         fontSize: 23,
                         fontWeight: FontWeight.bold,
                         color: Colors.deepOrange,
@@ -126,136 +133,151 @@ class ProductDetailsScreen extends StatelessWidget {
                         fontStyle: FontStyle.italic,
                       ),
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(width: 10),
                     Text(
-                      product.name.toUpperCase(),
+                      'Rs.${product.price.toStringAsFixed(2)}',
                       style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Row(
-                      children: [
-                        ProductTag(tagname: 'NEW'),
-                        SizedBox(width: 10),
-                        ProductTag(tagname: 'Regular'),
-                      ],
-                    ),
-                    SizedBox(height: 16),
-                    Text(
-                      product.description ?? 'No description available.',
-                      style: TextStyle(
                         fontSize: 14,
-                        color: Colors.grey.shade700,
-                        height: 1.4,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.grey,
+                        decoration: TextDecoration.lineThrough,
                       ),
                     ),
-                    const SizedBox(height: 20),
-                    DropdownButtonFormField<String>(
-                      value: productProvider.selectedSize,
-                      hint: const Text('Select Size'),
-                      items: sizes
-                          .map(
-                            (size) => DropdownMenuItem(
-                              value: size,
-                              child: Text(size),
-                            ),
-                          )
-                          .toList(),
-                      onChanged: (value) {
-                        productProvider.selectSize(value!);
-                      },
-                      decoration: InputDecoration(
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    const SizedBox(width: 10),
+                    if (product.discount > 0)
+                      Text(
+                        '-${product.discount.toStringAsFixed(0)}%',
+                        style: const TextStyle(
+                          fontSize: 13,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.deepOrange,
                         ),
                       ),
-                    ),
-                    SizedBox(height: 25),
-                    Container(
-                      height: 55,
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.black,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        onPressed: () {
-                          if (productProvider.selectedSize == null) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              const SnackBar(
-                                content: Text('Please select a size'),
-                              ),
-                            );
-                            return;
-                          }
-                        },
-                        child: GestureDetector(
-                          onTap: () async {
-                            final token = await UserSessionService().getToken();
-                            if (token == null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) => AuthScreen(),
-                                ),
-                              );
-                            }
-
-                            final success = await CartService().addtoCart(
-                              token: token,
-                              productId: product.id,
-                            );
-                            if (success) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text('Added to shopping bag'),
-                                ),
-                              );
-                            }
-                          },
-                          child: const Text(
-                            'ADD TO SHOPPING BAG',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                              letterSpacing: 1,
-                              color: Colors.white,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ),
                   ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 6),
+
+                /// PRODUCT NAME
+                Text(
+                  product.name.toUpperCase(),
+                  style: TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                    color: colorScheme.onSurface,
+                  ),
+                ),
+                const SizedBox(height: 10),
+
+                /// TAGS
+                Row(
+                  children: const [
+                    ProductTag(tagname: 'NEW'),
+                    SizedBox(width: 10),
+                    ProductTag(tagname: 'Regular'),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                /// DESCRIPTION
+                Text(
+                  product.description,
+                  style: TextStyle(
+                    fontSize: 14,
+                    color: isDark ? Colors.grey.shade300 : Colors.grey.shade700,
+                    height: 1.4,
+                  ),
+                ),
+                const SizedBox(height: 20),
+
+                /// SIZE DROPDOWN
+                DropdownButtonFormField<String>(
+                  value: productProvider.selectedSize,
+                  hint: const Text('Select Size'),
+                  items: sizes
+                      .map(
+                        (size) => DropdownMenuItem(
+                          value: size,
+                          child: Text(size),
+                        ),
+                      )
+                      .toList(),
+                  onChanged: (value) {
+                    productProvider.selectSize(value!);
+                  },
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 25),
+
+                /// ADD TO BAG BUTTON
+                SizedBox(
+                  height: 55,
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.black,
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
+                    ),
+                    onPressed: () async {
+                      if (productProvider.selectedSize == null) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Please select a size'),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final token = await UserSessionService().getToken();
+                      if (token == null) {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => AuthScreen(),
+                          ),
+                        );
+                        return;
+                      }
+
+                      final success = await CartService().addtoCart(
+                        token: token,
+                        productId: product.id,
+                      );
+
+                      if (success) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Added to shopping bag'),
+                          ),
+                        );
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => CartScreen(),
+                          ),
+                        );
+                      }
+                    },
+                    child: const Text(
+                      'ADD TO SHOPPING BAG',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           );
         },
-      ),
-    );
-  }
-}
-
-class ProductTag extends StatelessWidget {
-  final String tagname;
-  const ProductTag({super.key, required this.tagname});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10),
-        color: Colors.black,
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(8.0),
-        child: Center(
-          child: Text(tagname, style: TextStyle(color: Colors.white)),
-        ),
       ),
     );
   }
