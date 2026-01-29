@@ -8,18 +8,15 @@ class GuestView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // Access the current theme (which changes via your sensors)
     final colorScheme = Theme.of(context).colorScheme;
-
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(
           horizontal: 40,
-        ), // Slightly wider padding for luxury feel
+        ), 
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            // Using a more minimalist icon or your logo would go here
             Icon(
               Icons.shopping_bag_outlined,
               color: colorScheme.primary,
@@ -27,11 +24,11 @@ class GuestView extends StatelessWidget {
             ),
             const SizedBox(height: 40),
             Text(
-              title.toUpperCase(), // Uppercase for fashion branding
+              title.toUpperCase(), 
               style: TextStyle(
                 fontSize: 20,
-                fontWeight: FontWeight.w900, // Thick bold
-                letterSpacing: 4, // Spaced out for high-end look
+                fontWeight: FontWeight.w900, 
+                letterSpacing: 4,
                 color: colorScheme.onSurface,
               ),
             ),
@@ -41,25 +38,23 @@ class GuestView extends StatelessWidget {
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontSize: 14,
-                height: 1.5, // Better line spacing for readability
+                height: 1.5, 
                 color: colorScheme.onSurface.withOpacity(0.6),
               ),
             ),
             const SizedBox(height: 48),
-
-            // SIGN IN BUTTON (Primary)
             SizedBox(
               width: double.infinity,
               height: 55,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
                   backgroundColor:
-                      colorScheme.primary, // Black in Light, White in Dark
+                      colorScheme.primary, 
                   foregroundColor:
-                      colorScheme.onPrimary, // White in Light, Black in Dark
+                      colorScheme.onPrimary,
                   elevation: 0,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero, // Minimalist sharp corners
+                    borderRadius: BorderRadius.zero, 
                   ),
                 ),
                 onPressed: () {
@@ -86,7 +81,7 @@ class GuestView extends StatelessWidget {
                   side: BorderSide(color: colorScheme.primary, width: 1.5),
                   foregroundColor: colorScheme.primary,
                   shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero, // Sharp corners
+                    borderRadius: BorderRadius.zero, 
                   ),
                 ),
                 onPressed: () {

@@ -18,7 +18,13 @@ class CategoryProductsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
     return Scaffold(
-      appBar: AppBar(title: Text(categoryName)),
+      appBar: AppBar(
+        title: Text(categoryName),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios_new, color: colorScheme.onSurface),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
       body: FutureBuilder<List<Product>>(
         future: ProductService().fetchProductsByCategory(categoryId),
         builder: (context, snapshot) {
@@ -47,9 +53,8 @@ class CategoryProductsScreen extends StatelessWidget {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => ProductDetailsScreen(
-                        productId: product.id,
-                      ),
+                      builder: (_) =>
+                          ProductDetailsScreen(productId: product.id),
                     ),
                   );
                 },
