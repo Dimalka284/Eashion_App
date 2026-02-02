@@ -10,11 +10,12 @@ class SignupForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final _formKey = GlobalKey<FormState>();
     final authProvider = context.watch<AuthProvider>();
-    
+
     final TextEditingController _nameController = TextEditingController();
     final TextEditingController _emailController = TextEditingController();
     final TextEditingController _passwordController = TextEditingController();
-    final TextEditingController _confirmPasswordController = TextEditingController();
+    final TextEditingController _confirmPasswordController =
+        TextEditingController();
 
     return SingleChildScrollView(
       child: Padding(
@@ -28,7 +29,8 @@ class SignupForm extends StatelessWidget {
                 controller: _nameController,
                 isPassword: false,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'PLEASE ENTER YOUR NAME';
+                  if (value == null || value.isEmpty)
+                    return 'PLEASE ENTER YOUR NAME';
                   return null;
                 },
               ),
@@ -38,8 +40,11 @@ class SignupForm extends StatelessWidget {
                 controller: _emailController,
                 isPassword: false,
                 validator: (value) {
-                  if (value == null || value.isEmpty) return 'EMAIL IS REQUIRED';
-                  if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(value)) {
+                  if (value == null || value.isEmpty)
+                    return 'EMAIL IS REQUIRED';
+                  if (!RegExp(
+                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                  ).hasMatch(value)) {
                     return 'ENTER A VALID EMAIL';
                   }
                   return null;
@@ -62,7 +67,8 @@ class SignupForm extends StatelessWidget {
                 controller: _confirmPasswordController,
                 isPassword: true,
                 validator: (value) {
-                  if (value != _passwordController.text) return 'PASSWORDS DO NOT MATCH';
+                  if (value != _passwordController.text)
+                    return 'PASSWORDS DO NOT MATCH';
                   return null;
                 },
               ),
@@ -74,7 +80,9 @@ class SignupForm extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.black,
                     foregroundColor: Colors.white,
-                    shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.zero,
+                    ),
                     elevation: 0,
                   ),
                   onPressed: authProvider.isLoading
@@ -88,9 +96,21 @@ class SignupForm extends StatelessWidget {
                               _confirmPasswordController.text.trim(),
                             );
 
-                            if (success && context.mounted) {
+                            if (!context.mounted) return;
+
+                            if (success == null) {
                               ScaffoldMessenger.of(context).showSnackBar(
-                                const SnackBar(content: Text('REGISTRATION SUCCESSFUL')),
+                                const SnackBar(
+                                  content: Text('Registration successful'),
+                                  backgroundColor: Colors.green,
+                                ),
+                              );
+                            } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(success),
+                                  backgroundColor: Colors.red,
+                                ),
                               );
                             }
                           }
@@ -99,11 +119,17 @@ class SignupForm extends StatelessWidget {
                       ? const SizedBox(
                           height: 20,
                           width: 20,
-                          child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                          child: CircularProgressIndicator(
+                            color: Colors.white,
+                            strokeWidth: 2,
+                          ),
                         )
                       : const Text(
                           'CREATE ACCOUNT',
-                          style: TextStyle(letterSpacing: 2, fontWeight: FontWeight.bold),
+                          style: TextStyle(
+                            letterSpacing: 2,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                 ),
               ),

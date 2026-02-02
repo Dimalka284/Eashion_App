@@ -31,8 +31,8 @@ class AuthProvider with ChangeNotifier {
     }
   }
 
-  //Register
-  Future<bool> register(
+  // Register
+  Future<String?> register(
     String name,
     String email,
     String password,
@@ -48,22 +48,22 @@ class AuthProvider with ChangeNotifier {
         password,
         passwordConfirmation,
       );
-      isLoading = false;
-      notifyListeners();
 
       if (response['status'] == true) {
-        token = response['token']; // Save token after successful registration
+        token = response['token']; 
         print('Registration Successful! Token: $token');
-        return true;
+
+        return null;
       } else {
         print('Registration failed: ${response['message']}');
-        return false;
+        return response['message'] ?? 'Registration failed';
       }
     } catch (e) {
+      print('Registration error: $e');
+      return 'Something went wrong. Please try again.';
+    } finally {
       isLoading = false;
       notifyListeners();
-      return false;
     }
   }
-
 }

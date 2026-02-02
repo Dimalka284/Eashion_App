@@ -1,3 +1,4 @@
+import 'package:eashion2/provider/checkout_provider.dart';
 import 'package:eashion2/provider/theme_provider.dart';
 import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/provider/cart_provider.dart';
@@ -23,6 +24,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
+        ChangeNotifierProvider(create:(_)=>CheckoutProvider())
       ],
       child: const MyApp(),
     ),
@@ -68,9 +70,10 @@ class MyApp extends StatelessWidget {
               elevation: 0,
             ),
           ),
-          home: Wrapper(),
+          home:Wrapper(),
         );
       },
     );
   }
 }
+

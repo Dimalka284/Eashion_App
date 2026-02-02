@@ -41,7 +41,7 @@ class SmartThemeController extends ChangeNotifier {
   }
 
   void _calculateTheme() {
-    bool isRoomDark = _currentLux < 15;
+    bool isRoomDark = _currentLux < 8000;
     bool isLowBatteryCritical = _currentBatteryLevel < 20 && _currentBatteryState != BatteryState.charging;
 
     if (isRoomDark || isLowBatteryCritical) {
