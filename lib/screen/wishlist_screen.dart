@@ -1,9 +1,9 @@
-import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/provider/wishlist_provider.dart';
-import 'package:eashion2/services/user_session_service.dart';
+import 'package:eashion2/widgets/empty_message.dart';
+import 'package:eashion2/widgets/wishlist_cart.dart';
+import 'package:eashion2/widgets/wishlist_edit_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../model/product_model.dart';
 
 class WishlistScreen extends StatefulWidget {
   const WishlistScreen({super.key});
@@ -20,6 +20,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       Provider.of<WishlistProvider>(context, listen: false).loadWishlist();
     });
   }
+
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
@@ -42,7 +43,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
               onPressed: wishlist.toggleSelectMode,
               child: Text(
                 wishlist.isSelectMode ? 'Cancel' : 'Select',
-                style: const TextStyle(color:Colors.grey),
+                style: const TextStyle(color: Colors.grey),
               ),
             ),
           ),
@@ -51,14 +52,18 @@ class _WishlistScreenState extends State<WishlistScreen> {
       body: Consumer<WishlistProvider>(
         builder: (context, wishlist, _) {
           if (wishlist.wishlistProducts.isEmpty) {
-            return _emptyWishlist();
+            return EmptyMessage(
+              title: "Your wishlist is empty",
+              subtitle: "Save items you love for later",
+              icon: Icons.favorite_border,
+            );
           }
           return ListView.builder(
             padding: const EdgeInsets.all(12),
             itemCount: wishlist.wishlistProducts.length,
             itemBuilder: (context, index) {
               final product = wishlist.wishlistProducts[index];
-              return _wishlistItem(context, product);
+              return WishlistCard(context: context, product: product);
             },
           );
         },
@@ -68,171 +73,8 @@ class _WishlistScreenState extends State<WishlistScreen> {
           if (!wishlist.isSelectMode || wishlist.selectedIds.isEmpty) {
             return const SizedBox.shrink();
           }
-          return Container(
-            height: 60,
-            decoration: const BoxDecoration(
-              border: Border(top: BorderSide(color: Colors.grey)),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: TextButton(
-                    onPressed: wishlist.deleteSelected,
-                    child: const Text(
-                      'Delete',
-                      style: TextStyle(
-                        color: Colors.red,
-                        fontSize: 16,
-                        fontFamily: 'PlayfairDisplay',
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () async {
-                      final wishlist = context.read<WishlistProvider>();
-                      final token = await UserSessionService().getToken();
-                      await wishlist.moveSelectedToCart(token!);
-                      if (!mounted) return;
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Moved to shopping bag')),
-                      );
-                    },
-                    child: const Text(
-                      'Move to Bag',
-                      style: TextStyle(
-                        color: Colors.blue,
-                        fontSize: 16,
-                        fontFamily: 'PlayfairDisplay',
-                        fontWeight: FontWeight.w900,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          );
+          return WishlistBottomEditBar(mounted: mounted);
         },
-      ),
-    );
-  }
-
-
-  Widget _wishlistItem(BuildContext context, Product product) {
-    final wishlist = context.watch<WishlistProvider>();
-    final colorScheme = Theme.of(context).colorScheme;
-
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color:colorScheme.secondary ,
-        borderRadius: BorderRadius.circular(12),
-        boxShadow: [
-          BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8),
-        ],
-      ),
-      child: Row(
-        children: [
-          if (wishlist.isSelectMode)
-            GestureDetector(
-              onTap: () => wishlist.toggleSelection(product.id),
-              child: Padding(
-                padding: const EdgeInsets.only(left: 2, right: 4),
-                child: Container(
-                  width: 18,
-                  height: 18,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.grey),
-                    color: wishlist.isSelected(product.id)
-                        ? Colors.blue
-                        : Colors.white,
-                  ),
-                  child: wishlist.isSelected(product.id)
-                      ? const Icon(Icons.check, size: 14, color: Colors.white)
-                      : null,
-                ),
-              ),
-            ),
-
-          ClipRRect(
-            borderRadius: BorderRadius.circular(8),
-            child: Image.network(
-              product.imageUrl,
-              width: 90,
-              height: 120,
-              fit: BoxFit.cover,
-            ),
-          ),
-
-          const SizedBox(width: 12),
-
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  product.name,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 18,
-                  ),
-                ),
-                const SizedBox(height: 6),
-                Row(
-                  children: [
-                    Text(
-                      "Rs. ${(product.price - (product.price * product.discount / 100)).toStringAsFixed(2)}",
-                      style: const TextStyle(fontWeight: FontWeight.w600),
-                    ),
-                    const SizedBox(width: 10),
-                    Text(
-                      "Rs. ${product.price.toStringAsFixed(2)}",
-                      style: const TextStyle(
-                        fontWeight: FontWeight.w600,
-                        color: Colors.grey,
-                        decoration: TextDecoration.lineThrough,
-                      ),
-                    ),
-                  ],
-                ),
-                if (product.discount > 0)
-                  Text(
-                    "-${product.discount}% OFF",
-                    style: const TextStyle(color: Colors.red, fontSize: 12),
-                  ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-
-  Widget _emptyWishlist() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: const [
-          Icon(Icons.favorite_border, size: 90, color: Colors.grey),
-          SizedBox(height: 16),
-          Text(
-            "Your wishlist is empty",
-            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-          ),
-          SizedBox(height: 8),
-          Text(
-            "Save items you love for later",
-            style: TextStyle(color: Colors.grey),
-          ),
-        ],
       ),
     );
   }

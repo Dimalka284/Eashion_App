@@ -1,10 +1,15 @@
 import 'package:eashion2/model/cart_model.dart';
-import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/provider/cart_provider.dart';
 import 'package:eashion2/provider/checkout_provider.dart';
 import 'package:eashion2/screen/home_screen.dart';
 import 'package:eashion2/services/user_session_service.dart';
 import 'package:eashion2/widgets/checkout_Text_field.dart';
+import 'package:eashion2/widgets/location_action_btn.dart';
+import 'package:eashion2/widgets/manual_address_form.dart';
+import 'package:eashion2/widgets/order_list.dart';
+import 'package:eashion2/widgets/order_total_footer.dart';
+import 'package:eashion2/widgets/shipping_address_card.dart';
+import 'package:eashion2/widgets/step_section_header.dart';
 import 'package:flutter/material.dart';
 import 'package:eashion2/services/location_service.dart';
 import 'package:provider/provider.dart';
@@ -75,10 +80,12 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildSectionTitle(context, "01", "SHIPPING DETAILS"),
+                  StepSectionHeader(
+                    context: context,
+                    num: "01",
+                    title: "SHIPPING DETAILS",
+                  ),
                   const SizedBox(height: 20),
-
-                  // Contact Inputs
                   CheckoutTextField(
                     nameController: _nameController,
                     lable: "Full Name",
@@ -90,55 +97,71 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
                     lable: "Phone Number",
                     icon: Icons.phone_android_outlined,
                   ),
-
                   const SizedBox(height: 30),
-                  _buildSectionTitle(context, "02", "DESTINATION"),
+                  StepSectionHeader(
+                    context: context,
+                    num: "02",
+                    title: "DESTINATION",
+                  ),
                   const SizedBox(height: 15),
-
-                  // Master Address View
-                  _buildAddressDisplay(colorScheme),
+                  ShippingAddressCard(
+                    masterAddressController: _masterAddressController,
+                    colorScheme: colorScheme,
+                  ),
                   const SizedBox(height: 15),
-
-                  // Action Buttons
                   Row(
                     children: [
                       Expanded(
-                        child: _buildActionButton(
-                          context,
-                          "GPS LOCATE",
-                          Icons.my_location,
-                          _useGps,
-                          true,
+                        child: LocationActionButton(
+                          context: context,
+                          label: "GPS LOCATE",
+                          icon: Icons.my_location,
+                          onTap: _useGps,
+                          isPrimary: true,
                         ),
                       ),
                       const SizedBox(width: 12),
                       Expanded(
-                        child: _buildActionButton(
-                          context,
-                          "POSTAL",
-                          Icons.edit_location_alt_outlined,
-                          () {
+                        child: LocationActionButton(
+                          context: context,
+                          label: "POSTAL",
+                          icon: Icons.edit_location_alt_outlined,
+                          onTap: () {
                             setState(
                               () => showPostalFields = !showPostalFields,
                             );
                           },
-                          false,
+                          isPrimary: false,
                         ),
                       ),
                     ],
                   ),
 
-                  if (showPostalFields) _buildPostalForm(colorScheme),
+                  if (showPostalFields)
+                    ManualAddressForm(
+                      townController: _townController,
+                      postalController: _postalController,
+                      districtController: _districtController,
+                      provinceController: _provinceController,
+                      onApply: _applyPostalAddress,
+                    ),
                   const SizedBox(height: 40),
-                  _buildSectionTitle(context, "03", "ORDER SUMMARY"),
+                  StepSectionHeader(
+                    context: context,
+                    num: "03",
+                    title: "ORDER SUMMARY",
+                  ),
                   const SizedBox(height: 15),
-                  _buildOrderList(colorScheme),
+                  OrderList(widget: widget, colorScheme: colorScheme),
                   const SizedBox(height: 20),
                 ],
               ),
             ),
           ),
-          _buildBottomBar(colorScheme),
+          OrderTotalFooter(
+            totalAmount: totalAmount,
+            onConfirm: _handleOrderConfirmation,
+          ),
         ],
       ),
     );
@@ -231,259 +254,6 @@ class _CheckoutScreenState extends State<CheckoutScreen> {
       ),
     );
   }
-
-  Widget _buildSectionTitle(BuildContext context, String num, String title) {
-    return Row(
-      children: [
-        Text(
-          num,
-          style: const TextStyle(
-            fontWeight: FontWeight.w900,
-            fontSize: 16,
-            decoration: TextDecoration.underline,
-          ),
-        ),
-        const SizedBox(width: 10),
-        Text(
-          title,
-          style: const TextStyle(
-            letterSpacing: 2,
-            fontWeight: FontWeight.bold,
-            fontSize: 13,
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildAddressDisplay(ColorScheme colorScheme) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: colorScheme.secondary,
-        borderRadius: BorderRadius.zero,
-        border: Border.all(color: colorScheme.onSurface.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            "DELIVERY TO:",
-            style: TextStyle(
-              fontSize: 10,
-              fontWeight: FontWeight.bold,
-              color: colorScheme.primary.withOpacity(0.5),
-            ),
-          ),
-          const SizedBox(height: 5),
-          Text(
-            _masterAddressController.text.isEmpty
-                ? "No address selected yet."
-                : _masterAddressController.text,
-            style: TextStyle(
-              fontSize: 15,
-              fontWeight: FontWeight.w500,
-              color: colorScheme.onSurface,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-    BuildContext context,
-    String label,
-    IconData icon,
-    VoidCallback onTap,
-    bool isPrimary,
-  ) {
-    final colorScheme = Theme.of(context).colorScheme;
-    return SizedBox(
-      height: 45,
-      child: OutlinedButton.icon(
-        onPressed: onTap,
-        icon: Icon(icon, size: 18),
-        label: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 11,
-            fontWeight: FontWeight.bold,
-            letterSpacing: 1,
-          ),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: isPrimary
-              ? colorScheme.onPrimary
-              : colorScheme.primary,
-          backgroundColor: isPrimary ? colorScheme.primary : Colors.transparent,
-          side: BorderSide(color: colorScheme.primary),
-          shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOrderList(ColorScheme colorScheme) {
-    return Column(
-      children: widget.selectedItems.map((item) {
-        final price =
-            item.product.price -
-            (item.product.price * item.product.discount / 100);
-        return Padding(
-          padding: const EdgeInsets.only(bottom: 15),
-          child: Row(
-            children: [
-              Container(
-                height: 70,
-                width: 60,
-                decoration: BoxDecoration(
-                  color: colorScheme.secondary,
-                  image: DecorationImage(
-                    image: NetworkImage(item.product.imageUrl),
-                    fit: BoxFit.cover,
-                  ),
-                ),
-              ),
-              const SizedBox(width: 15),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      item.product.name.toUpperCase(),
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 12,
-                        letterSpacing: 1,
-                      ),
-                    ),
-                    Text(
-                      "Quantity: ${item.quantity}",
-                      style: TextStyle(
-                        color: colorScheme.onSurface.withOpacity(0.5),
-                        fontSize: 11,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Text(
-                "Rs. ${price.toStringAsFixed(0)}",
-                style: const TextStyle(fontWeight: FontWeight.w900),
-              ),
-            ],
-          ),
-        );
-      }).toList(),
-    );
-  }
-
-  Widget _buildBottomBar(ColorScheme colorScheme) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 25, vertical: 30),
-      decoration: BoxDecoration(
-        color: colorScheme.surface,
-        border: Border(
-          top: BorderSide(color: colorScheme.onSurface.withOpacity(0.1)),
-        ),
-      ),
-      child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  "TOTAL",
-                  style: TextStyle(
-                    letterSpacing: 2,
-                    fontWeight: FontWeight.w300,
-                  ),
-                ),
-                Text(
-                  "Rs. ${totalAmount.toStringAsFixed(2)}",
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.w900,
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 55,
-              child: ElevatedButton(
-                onPressed: _handleOrderConfirmation,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: colorScheme.primary,
-                  foregroundColor: colorScheme.onPrimary,
-                  shape: const RoundedRectangleBorder(
-                    borderRadius: BorderRadius.zero,
-                  ),
-                ),
-                child: const Text(
-                  "CONFIRM ORDER",
-                  style: TextStyle(
-                    letterSpacing: 3,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPostalForm(ColorScheme colorScheme) {
-    return Container(
-      margin: const EdgeInsets.only(top: 20),
-      padding: const EdgeInsets.all(20),
-      color: colorScheme.secondary,
-      child: Column(
-        children: [
-          CheckoutTextField(
-            nameController: _townController,
-            lable: "Town",
-            icon: Icons.location_city,
-          ),
-          const SizedBox(height: 10),
-          CheckoutTextField(
-            nameController: _postalController,
-            lable: "Postal Code",
-            icon: Icons.local_post_office,
-          ),
-          const SizedBox(height: 10),
-          CheckoutTextField(
-            nameController: _districtController,
-            lable: "District",
-            icon: Icons.map,
-          ),
-          const SizedBox(height: 10),
-          CheckoutTextField(
-            nameController: _provinceController,
-            lable: "Province",
-            icon: Icons.explore,
-          ),
-          const SizedBox(height: 15),
-          _buildActionButton(
-            context,
-            "APPLY ADDRESS",
-            Icons.check_circle_outline,
-            _applyPostalAddress,
-            true,
-          ),
-        ],
-      ),
-    );
-  }
-
-  // --- LOGIC METHODS ---
 
   Future<void> _useGps() async {
     ScaffoldMessenger.of(context).showSnackBar(

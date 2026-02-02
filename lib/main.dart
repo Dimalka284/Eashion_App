@@ -24,7 +24,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => WishlistProvider()),
         ChangeNotifierProvider(create: (_) => ProductProvider()),
         ChangeNotifierProvider(create: (_) => CartProvider()),
-        ChangeNotifierProvider(create:(_)=>CheckoutProvider())
+        ChangeNotifierProvider(create: (_) => CheckoutProvider()),
       ],
       child: const MyApp(),
     ),
@@ -41,7 +41,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           debugShowCheckedModeBanner: false,
-          themeMode: themeController.themeMode, 
+          themeMode: themeController.themeMode,
           theme: ThemeData(
             useMaterial3: true,
             brightness: Brightness.light,
@@ -70,10 +70,9 @@ class MyApp extends StatelessWidget {
               elevation: 0,
             ),
           ),
-          home:Wrapper(),
+          home: Wrapper(),
         );
       },
     );
   }
 }
-
