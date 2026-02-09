@@ -84,7 +84,12 @@ class _CartScreenState extends State<CartScreen> {
                   );
                 },
               ),
-              CartTotalBottomPanel(selectedItems: _selectedItems, context: context, cart: cart, colorScheme: colorScheme),
+              CartTotalBottomPanel(
+                selectedItems: _selectedItems,
+                context: context,
+                cart: cart,
+                colorScheme: colorScheme,
+              ),
             ],
           );
         },
@@ -92,4 +97,3 @@ class _CartScreenState extends State<CartScreen> {
     );
   }
 }
-

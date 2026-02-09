@@ -14,13 +14,13 @@ class CartProvider extends ChangeNotifier {
   bool get isLoggedIn => _isLoggedIn;
 
   double get total => _items.fold(
-        0,
-        (sum, item) =>
-            sum +
-            ((item.product.price -
-                    (item.product.price * item.product.discount / 100)) *
-                item.quantity),
-      );
+    0,
+    (sum, item) =>
+        sum +
+        ((item.product.price -
+                (item.product.price * item.product.discount / 100)) *
+            item.quantity),
+  );
 
   Future<void> loadCart() async {
     _isLoading = true;

@@ -5,25 +5,19 @@ import 'package:eashion2/widgets/wishlist_edit_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-class WishlistScreen extends StatefulWidget {
+class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
-
-  @override
-  State<WishlistScreen> createState() => _WishlistScreenState();
-}
-
-class _WishlistScreenState extends State<WishlistScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.microtask(() {
-      Provider.of<WishlistProvider>(context, listen: false).loadWishlist();
-    });
-  }
 
   @override
   Widget build(BuildContext context) {
     final colorScheme = Theme.of(context).colorScheme;
+    Future.microtask(() {
+      final provider = Provider.of<WishlistProvider>(context, listen: false);
+      if (provider.wishlistProducts.isEmpty) {
+        provider.loadWishlist();
+      }
+    });
+
     return Scaffold(
       backgroundColor: colorScheme.onPrimary,
       appBar: AppBar(
@@ -52,7 +46,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
       body: Consumer<WishlistProvider>(
         builder: (context, wishlist, _) {
           if (wishlist.wishlistProducts.isEmpty) {
-            return EmptyMessage(
+            return const EmptyMessage(
               title: "Your wishlist is empty",
               subtitle: "Save items you love for later",
               icon: Icons.favorite_border,
@@ -73,7 +67,7 @@ class _WishlistScreenState extends State<WishlistScreen> {
           if (!wishlist.isSelectMode || wishlist.selectedIds.isEmpty) {
             return const SizedBox.shrink();
           }
-          return WishlistBottomEditBar(mounted: mounted);
+          return const WishlistBottomEditBar();
         },
       ),
     );

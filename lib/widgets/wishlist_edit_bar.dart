@@ -1,16 +1,10 @@
-
 import 'package:eashion2/provider/wishlist_provider.dart';
 import 'package:eashion2/services/user_session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 class WishlistBottomEditBar extends StatelessWidget {
-  const WishlistBottomEditBar({
-    super.key,
-    required this.mounted,
-  });
-
-  final bool mounted;
+  const WishlistBottomEditBar({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -42,7 +36,7 @@ class WishlistBottomEditBar extends StatelessWidget {
                 final wishlist = context.read<WishlistProvider>();
                 final token = await UserSessionService().getToken();
                 await wishlist.moveSelectedToCart(token!);
-                if (!mounted) return;
+                if (context.mounted) return;
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text('Moved to shopping bag')),
                 );
@@ -63,4 +57,3 @@ class WishlistBottomEditBar extends StatelessWidget {
     );
   }
 }
-
