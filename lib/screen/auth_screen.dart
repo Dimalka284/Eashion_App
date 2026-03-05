@@ -1,8 +1,11 @@
+import 'package:eashion2/provider/auth_provider.dart';
 import 'package:eashion2/services/auth_service.dart';
 import 'package:eashion2/services/user_session_service.dart';
 import 'package:flutter/material.dart';
 import 'package:eashion2/widgets/login_form.dart';
 import 'package:eashion2/widgets/signup_form.dart';
+import 'package:provider/provider.dart';
+import 'package:quickalert/quickalert.dart';
 
 class AuthScreen extends StatelessWidget {
   const AuthScreen({super.key});
@@ -89,22 +92,90 @@ class AuthScreen extends StatelessWidget {
                     ],
                   ),
                   Expanded(
-                    child: SizedBox(
-                      child: TabBarView(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: LoginForm(),
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 30),
-                            child: SignupForm(),
-                          ),
-                        ],
-                      ),
+                    child: TabBarView(
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: LoginForm(),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 30),
+                          child: SignupForm(),
+                        ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 40),
+                    child: Column(
+                      children: [
+                        const Row(
+                          children: [
+                            Expanded(child: Divider(color: Colors.white70)),
+                            Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10),
+                              child: Text(
+                                'OR',
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ),
+                            Expanded(child: Divider(color: Colors.white70)),
+                          ],
+                        ),
+                        const SizedBox(height: 20),
+                        SizedBox(
+                          width: double.infinity,
+                          height: 50,
+                          child: OutlinedButton.icon(
+                            style: OutlinedButton.styleFrom(
+                              side: const BorderSide(color: Colors.white),
+                              foregroundColor: Colors.white,
+                              shape: const RoundedRectangleBorder(
+                                borderRadius: BorderRadius.zero,
+                              ),
+                            ),
+                            icon: const Icon(
+                              Icons.login,
+                            ), // You can use a Google icon if you have one
+                            label: const Text(
+                              'CONTINUE WITH GOOGLE',
+                              style: TextStyle(
+                                letterSpacing: 1.2,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            onPressed: () async {
+                              final authProvider = context.read<AuthProvider>();
+                              if (authProvider.isLoading) return;
+
+                              final success = await authProvider
+                                  .signInWithGoogle();
+                              if (success && context.mounted) {
+                                QuickAlert.show(
+                                  context: context,
+                                  text: "Google Login Successful",
+                                  type: QuickAlertType.success,
+                                  autoCloseDuration: const Duration(seconds: 2),
+                                );
+                              } else if (!success && context.mounted) {
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  text: "Google login failed",
+                                  autoCloseDuration: const Duration(seconds: 2),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 40),
                 ],
               ),
             ),

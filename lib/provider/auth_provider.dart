@@ -7,6 +7,29 @@ class AuthProvider with ChangeNotifier {
   bool isLoading = false;
   String? token;
 
+  // Google Sign-In
+  Future<bool> signInWithGoogle() async {
+    isLoading = true;
+    notifyListeners();
+
+    try {
+      final response = await AuthService().signInWithGoogle();
+      isLoading = false;
+      notifyListeners();
+
+      if (response['status'] == true) {
+        token = response['token'];
+        return true;
+      } else {
+        return false;
+      }
+    } catch (e) {
+      isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
   //Login
   Future<bool> login(String email, String password) async {
     isLoading = true;
@@ -50,7 +73,7 @@ class AuthProvider with ChangeNotifier {
       );
 
       if (response['status'] == true) {
-        token = response['token']; 
+        token = response['token'];
         print('Registration Successful! Token: $token');
 
         return null;
